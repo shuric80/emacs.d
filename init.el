@@ -807,29 +807,30 @@
   :bind
   ([f5] . browse-url))
 
-(use-package bruh
-  :quelpa
-  (bruh :repo "a13/bruh" :fetcher github)
-  :custom-update
-  (bruh-images-re
-   '("^https?://img-fotki\\.yandex\\.ru/get/"
-     "^https?://pics\\.livejournal\\.com/.*/pic/"
-     "^https?://l-userpic\\.livejournal\\.com/"
-     "^https?://img\\.leprosorium\\.com/[0-9]+$"))
-  :custom
-  (bruh-videos-browser-function #'bruh-mpv)
-  (browse-url-browser-function
-   (append
-    (bruh-videos-re-alist)
-    (bruh-images-re-alist)
-    '(("." . bruh-chromium-new-app)))))
+;; (use-package bruh
+;;   :quelpa
+;;   (bruh :repo "a13/bruh" :fetcher github)
+;;   :custom-update
+;;   (bruh-images-re
+;;    '("^https?://img-fotki\\.yandex\\.ru/get/"
+;;      "^https?://pics\\.livejournal\\.com/.*/pic/"
+;;      "^https?://l-userpic\\.livejournal\\.com/"
+;;      "^https?://img\\.leprosorium\\.com/[0-9]+$"))
+;;   :custom
+;;   (bruh-videos-browser-function #'bruh-mpv)
+;;   (browse-url-browser-function
+;;    (append
+;;     (bruh-videos-re-alist)
+;;     (bruh-images-re-alist)
+;;     '(("." . bruh-chromium-new-app)))))
 
 
 (use-package webjump
   :bind
   (([S-f5] . webjump))
   :config
-  (setq webjump-sites
+  (setq webjump-
+        sites
         (append '(("debian packages" .
                    [simple-query "packages.debian.org" "http://packages.debian.org/" ""]))
                 webjump-sample-sites)))
@@ -899,6 +900,23 @@
   :defer t
   :custom
   (mu4e-html2text-command 'mu4e-shr2text))
+
+(use-package telega
+  :load-path  "~/telega.el"
+  :commands (telega)
+  :defer t
+  :config
+  (setq telega-symbol-unread "\U0001f10c")
+  (telega-notifications-mode 1)
+  (add-hook 'telega-chat-mode-hook
+            (lambda ()
+              (set (make-local-variable 'company-backends)
+                   (append '(telega-company-emoji
+                             telega-company-username
+                             telega-company-hashtag)
+                           (when (telega-chat-bot-p telega-chatbuf--chat)
+                             '(telega-company-botcmd))))
+              (company-mode 1))))
 
 (use-package calendar
   :defer t
@@ -1159,6 +1177,63 @@
   :config
   (avy-flycheck-setup))
 
+(use-package python
+  :mode ("\\.py" . python-mode)
+  :config
+  (setq py-python-command "python3")
+  (setq python-shell-interpreter "python3")
+  (setq python-indent-offset 4)
+)
+
+      (use-package pipenv
+        :hook(python-mode pipenv-mode)
+        :init
+        (setq
+         pipenv-projectile-after-switch-function
+         #'pipenv-projectile-after-switch-extended))
+
+      ;; (use-package company-anaconda
+      ;;  :after(anaconda-moda company)
+      ;;  :config(add-to-list 'company-backends 'company-anaconda))
+
+      (use-package company-jedi
+        :config
+        (setq jedi:environment-virtualenv(list(expand-file-name "~/.local/share/virtualenvs")))
+        (add-hook 'python-mode-hook 'jedi:setup)
+        (setq jedi:complete-on-dot t)
+        (setq jedi:use-shortcuts t)
+        (defun config/enable-company-jedi()
+          (add-to-list 'company-backends 'company-jedi))
+        (add-hook 'python-mode-hook 'config/enable-company-jedi)
+        :bind (:map python-mode-map
+                    ("M-." . jedi:goto-definition)
+                    ("C-c C-b" . python-add-breakpoint)
+                    ("RET" . newline-and-indent)
+                    ("M-RET" . newline)
+                    ("M-," . jedi:goto-definition-pop-marker)
+                    ("M-/" . jedi:show-doc)
+                    ("M-?" . helm-jedi-related-names)
+                    )
+        )
+
+      (defun python-add-breakpoint ()
+        "Add a break point"
+        (interactive)
+        (newline-and-indent)
+        (insert "import pdb; pdb.set_trace()")
+        (highlight-lines-matching-regexp "^[ ]*import ipdb; ipdb.set_trace()"))
+
+      (use-package python-pytest
+        :custom
+        (python-pytest-confirm t)
+        ;;:config
+        ;; (magit-define-popup-switch 'python-pytest-popup?z "Custom flag" "--zzz")
+        )
+
+      (use-package py-yapf
+        :config
+        (add-hook 'python-mode-hook 'py-yapf-enable-on-server))
+
 (use-package lisp
   :hook
   (after-save . check-parens))
@@ -1308,6 +1383,20 @@
   :custom
   (graphql-url "http://localhost:8000/api/graphql/query"))
 
+(use-package rjsx-mode
+  :mode ".jsx"
+  :config
+  (setq indent-tabs-mode nil) ;;Use space instead of tab
+  (setq js-indent-level 2) ;;space width is 2 (default is 4)
+  (setq js2-strict-missing-semi-warning nil) ;;disable the semicolon warning
+  ;; :bind
+  ;; ( :map rjsx-mode-map
+  ;;        ("<" . "test")
+  ;;        ("C-d" . 'test2')
+  ;;        (">" . 'rteee' )
+  ;;        )
+  )
+
 (use-package sh-script
   :mode (("zshecl" . sh-mode)
          ("\\.zsh\\'" . sh-mode))
@@ -1444,6 +1533,6 @@
   (reverse-im-mode t))
 
 ;; Local Variables:
-;; eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
+;;   eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
 ;; End:
 ;;; init.el ends here
