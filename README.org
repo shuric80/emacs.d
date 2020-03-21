@@ -470,7 +470,7 @@
        :custom
        (face-font-family-alternatives '(("Consolas" "Monaco" "Monospace")))
        :custom-face
-       (default ((t (:family "Consolas" :height 160))))
+       (default ((t (:family "Consolas" :height 120))))
        ;; workaround for old charsets
        :config
        (set-fontset-font "fontset-default" 'cyrillic
