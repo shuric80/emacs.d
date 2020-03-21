@@ -1274,6 +1274,12 @@
       :ensure t
       :defer t)
 
+    (use-package git-gutter
+      :ensure t
+      :config
+      (global-git-gutter-mode 't)
+      :diminish git-gutter-mode)
+
     (use-package browse-at-remote
       :ensure t
       :after link-hint
