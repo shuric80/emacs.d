@@ -1426,51 +1426,18 @@
    [[https://xkcd.com/297/][https://imgs.xkcd.com/comics/lisp_cycles.png]]
 *** Python
     #+BEGIN_SRC emacs-lisp
-(use-package python
-  :mode ("\\.py" . python-mode)
-  :config
-  (setq py-python-command "python3")
-  (setq python-shell-interpreter "python3")
-  (setq python-indent-offset 4)
-)
+      (use-package importmagic
+        :ensure t
+        :hook
+        (python-mode-hook . importmagic-mode))
 
-      (use-package pipenv
-        :hook(python-mode pipenv-mode)
-        :init
-        (setq
-         pipenv-projectile-after-switch-function
-         #'pipenv-projectile-after-switch-extended))
-
-      ;; (use-package company-anaconda
-      ;;  :after(anaconda-moda company)
-      ;;  :config(add-to-list 'company-backends 'company-anaconda))
-
-      (use-package company-jedi
-        :config
-        (setq jedi:environment-virtualenv(list(expand-file-name "~/.local/share/virtualenvs")))
-        (add-hook 'python-mode-hook 'jedi:setup)
-        (setq jedi:complete-on-dot t)
-        (setq jedi:use-shortcuts t)
-        (defun config/enable-company-jedi()
-          (add-to-list 'company-backends 'company-jedi))
-        (add-hook 'python-mode-hook 'config/enable-company-jedi)
-        :bind (:map python-mode-map
-                    ("M-." . jedi:goto-definition)
-                    ("C-c C-b" . python-add-breakpoint)
-                    ("RET" . newline-and-indent)
-                    ("M-RET" . newline)
-                    ("M-," . jedi:goto-definition-pop-marker)
-                    ("M-/" . jedi:show-doc)
-                    ("M-?" . helm-jedi-related-names)
-                    )
+      (use-package anaconda-mode
+        :ensure t
+        :hook
+        (python-mode-hook . anaconda-mode)
+        (python-mode-hook . anaconda-eldoc-mode)
         )
 
-      (defun python-add-breakpoint ()
-        "Add a break point"
-        (interactive)
-        (newline-and-indent)
-        (insert "import pdb; pdb.set_trace()")
-        (highlight-lines-matching-regexp "^[ ]*import ipdb; ipdb.set_trace()"))
 
       (use-package python-pytest
         :custom
@@ -1479,9 +1446,13 @@
         ;; (magit-define-popup-switch 'python-pytest-popup?z "Custom flag" "--zzz")
         )
 
+      (use-package
+          py-isort
+        :config (setq py-isort-options '("-sl"))
+        :hook (python-mode-hook . py-isort-before-save))
+
       (use-package py-yapf
-        :config
-        (add-hook 'python-mode-hook 'py-yapf-enable-on-server))
+        :hook (python-mode-hook . py-yapf-enable-on-server))
 
     #+END_SRC
 
