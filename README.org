@@ -576,9 +576,14 @@
    #+END_SRC
 ** Highlighting
    #+BEGIN_SRC emacs-lisp
-     (use-package paren
+     ;;(use-package paren
+     ;;  :config
+     ;;  (show-paren-mode t))
+     (use-package smartparens
+       :ensure t
+       :diminish smartparens-mode
        :config
-       (show-paren-mode t))
+       (add-hook 'prog-mode-hook 'smartparens-mode))
 
      (use-package hl-line
        :hook
