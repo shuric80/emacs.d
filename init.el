@@ -326,7 +326,7 @@
   :custom
   (face-font-family-alternatives '(("Consolas" "Monaco" "Monospace")))
   :custom-face
-  (default ((t (:family "Consolas" :height 160))))
+  (default ((t (:family "Consolas" :height 120))))
   ;; workaround for old charsets
   :config
   (set-fontset-font "fontset-default" 'cyrillic
@@ -413,9 +413,14 @@
   :config
   (winner-mode 1))
 
-(use-package paren
+;;(use-package paren
+;;  :config
+;;  (show-paren-mode t))
+(use-package smartparens
+  :ensure t
+  :diminish smartparens-mode
   :config
-  (show-paren-mode t))
+  (add-hook 'prog-mode-hook 'smartparens-mode))
 
 (use-package hl-line
   :hook
@@ -1052,6 +1057,12 @@
   :ensure t
   :defer t)
 
+(use-package git-gutter
+  :ensure t
+  :config
+  (global-git-gutter-mode 't)
+  :diminish git-gutter-mode)
+
 (use-package browse-at-remote
   :ensure t
   :after link-hint
@@ -1118,8 +1129,8 @@
         ("C-n" . company-select-next-or-abort)
         ("C-p" . company-select-previous-or-abort))
   :hook
-  (after-init . global-company-mode))
-
+  (after-init . global-company-mode)
+  )
 (use-package company-quickhelp
   :ensure t
   :defer t
@@ -1177,62 +1188,33 @@
   :config
   (avy-flycheck-setup))
 
-(use-package python
-  :mode ("\\.py" . python-mode)
-  :config
-  (setq py-python-command "python3")
-  (setq python-shell-interpreter "python3")
-  (setq python-indent-offset 4)
-)
+(use-package importmagic
+  :ensure t
+  :hook
+  (python-mode-hook . importmagic-mode))
 
-      (use-package pipenv
-        :hook(python-mode pipenv-mode)
-        :init
-        (setq
-         pipenv-projectile-after-switch-function
-         #'pipenv-projectile-after-switch-extended))
+(use-package anaconda-mode
+  :ensure t
+  :hook
+  (python-mode-hook . anaconda-mode)
+  (python-mode-hook . anaconda-eldoc-mode)
+  )
 
-      ;; (use-package company-anaconda
-      ;;  :after(anaconda-moda company)
-      ;;  :config(add-to-list 'company-backends 'company-anaconda))
 
-      (use-package company-jedi
-        :config
-        (setq jedi:environment-virtualenv(list(expand-file-name "~/.local/share/virtualenvs")))
-        (add-hook 'python-mode-hook 'jedi:setup)
-        (setq jedi:complete-on-dot t)
-        (setq jedi:use-shortcuts t)
-        (defun config/enable-company-jedi()
-          (add-to-list 'company-backends 'company-jedi))
-        (add-hook 'python-mode-hook 'config/enable-company-jedi)
-        :bind (:map python-mode-map
-                    ("M-." . jedi:goto-definition)
-                    ("C-c C-b" . python-add-breakpoint)
-                    ("RET" . newline-and-indent)
-                    ("M-RET" . newline)
-                    ("M-," . jedi:goto-definition-pop-marker)
-                    ("M-/" . jedi:show-doc)
-                    ("M-?" . helm-jedi-related-names)
-                    )
-        )
+(use-package python-pytest
+  :custom
+  (python-pytest-confirm t)
+  ;;:config
+  ;; (magit-define-popup-switch 'python-pytest-popup?z "Custom flag" "--zzz")
+  )
 
-      (defun python-add-breakpoint ()
-        "Add a break point"
-        (interactive)
-        (newline-and-indent)
-        (insert "import pdb; pdb.set_trace()")
-        (highlight-lines-matching-regexp "^[ ]*import ipdb; ipdb.set_trace()"))
+(use-package
+    py-isort
+  :config (setq py-isort-options '("-sl"))
+  :hook (python-mode-hook . py-isort-before-save))
 
-      (use-package python-pytest
-        :custom
-        (python-pytest-confirm t)
-        ;;:config
-        ;; (magit-define-popup-switch 'python-pytest-popup?z "Custom flag" "--zzz")
-        )
-
-      (use-package py-yapf
-        :config
-        (add-hook 'python-mode-hook 'py-yapf-enable-on-server))
+(use-package py-yapf
+  :hook (python-mode-hook . py-yapf-enable-on-server))
 
 (use-package lisp
   :hook
@@ -1383,19 +1365,35 @@
   :custom
   (graphql-url "http://localhost:8000/api/graphql/query"))
 
+(use-package prettier-js
+  :ensure t
+  :config
+  (setq prettier-js-args '(
+                           "--trailing-comma" "es5"
+                           "--single-quote" "true"
+                           "--print-width" "100"
+                           ))
+  (add-hook 'js2-mode-hook 'prettier-js-mode)
+  (add-hook 'rjsx-mode-hook 'prettier-js-mode))
+
 (use-package rjsx-mode
   :mode ".jsx"
   :config
   (setq indent-tabs-mode nil) ;;Use space instead of tab
   (setq js-indent-level 2) ;;space width is 2 (default is 4)
   (setq js2-strict-missing-semi-warning nil) ;;disable the semicolon warning
-  ;; :bind
-  ;; ( :map rjsx-mode-map
-  ;;        ("<" . "test")
-  ;;        ("C-d" . 'test2')
-  ;;        (">" . 'rteee' )
-  ;;        )
   )
+
+;; (use-package js-doc
+;;   :ensure t
+;;   :bind (:map js2-mode-map
+;;               ("C-c i" . js-doc-insert-function-doc)
+;;               ("@" . js-doc-insert-tag))
+;;   :config
+;;   (setq js-doc-mail-address "jamiecollinson@gmail.com"
+;;         js-doc-author (format "Jamie Collinson <%s>" js-doc-mail-address)
+;;         js-doc-url "jamiecollinson.com"
+;;         js-doc-license "MIT License"))
 
 (use-package sh-script
   :mode (("zshecl" . sh-mode)

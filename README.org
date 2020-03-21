@@ -1,8 +1,8 @@
 #+INFOJS_OPT: view:t toc:t ltoc:t mouse:underline buttons:0 path:https://www.linux.org.ru/tango/combined.css
 : Emacs Config
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
 #+PROPERTY: header-args:emacs-lisp :tangle "init.el"
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
 * Foreword and keynotes
 ** Use Use-package
    I try to keep my configuration as declarative as possible, thanks to [[https://github.com/jwiegley/use-package][Use-package]] — it's easy now.
@@ -1352,8 +1352,8 @@
              ("C-n" . company-select-next-or-abort)
              ("C-p" . company-select-previous-or-abort))
        :hook
-       (after-init . global-company-mode))
-
+       (after-init . global-company-mode)
+       )
      (use-package company-quickhelp
        :ensure t
        :defer t
@@ -1633,19 +1633,35 @@
         :custom
         (graphql-url "http://localhost:8000/api/graphql/query"))
 
+      (use-package prettier-js
+        :ensure t
+        :config
+        (setq prettier-js-args '(
+                                 "--trailing-comma" "es5"
+                                 "--single-quote" "true"
+                                 "--print-width" "100"
+                                 ))
+        (add-hook 'js2-mode-hook 'prettier-js-mode)
+        (add-hook 'rjsx-mode-hook 'prettier-js-mode))
+
       (use-package rjsx-mode
         :mode ".jsx"
         :config
         (setq indent-tabs-mode nil) ;;Use space instead of tab
         (setq js-indent-level 2) ;;space width is 2 (default is 4)
         (setq js2-strict-missing-semi-warning nil) ;;disable the semicolon warning
-        ;; :bind
-        ;; ( :map rjsx-mode-map
-        ;;        ("<" . "test")
-        ;;        ("C-d" . 'test2')
-        ;;        (">" . 'rteee' )
-        ;;        )
         )
+
+      ;; (use-package js-doc
+      ;;   :ensure t
+      ;;   :bind (:map js2-mode-map
+      ;;               ("C-c i" . js-doc-insert-function-doc)
+      ;;               ("@" . js-doc-insert-tag))
+      ;;   :config
+      ;;   (setq js-doc-mail-address "jamiecollinson@gmail.com"
+      ;;         js-doc-author (format "Jamie Collinson <%s>" js-doc-mail-address)
+      ;;         js-doc-url "jamiecollinson.com"
+      ;;         js-doc-license "MIT License"))
     #+END_SRC
 
 *** Shell
