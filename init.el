@@ -413,14 +413,14 @@
   :config
   (winner-mode 1))
 
-;;(use-package paren
-;;  :config
-;;  (show-paren-mode t))
-(use-package smartparens
-  :ensure t
-  :diminish smartparens-mode
+(use-package paren
   :config
-  (add-hook 'prog-mode-hook 'smartparens-mode))
+  (show-paren-mode t))
+;;(use-package smartparens
+;;  :ensure t
+;;  :diminish smartparens-mode
+;;  :config
+;;  (add-hook 'prog-mode-hook 'smartparens-mode))
 
 (use-package hl-line
   :hook
@@ -1188,18 +1188,48 @@
   :config
   (avy-flycheck-setup))
 
+(defun annotate-pdb()
+  (interactive)
+  (highlight-lines-matching-regexp "import ipdb")
+  (highlight-lines-matching-regexp "import pdb")
+  (highlight-lines-matching-regexp "set_trace()")
+  (highlight-regexp "^TODO ")
+  (highlight-phrase "FIXME"))
+
+
 (use-package importmagic
   :ensure t
-  :hook
-  (python-mode-hook . importmagic-mode))
+  :config
+  (add-hook 'python-mode-hook 'importmagic-mode))
 
-(use-package anaconda-mode
-  :ensure t
-  :hook
-  (python-mode-hook . anaconda-mode)
-  (python-mode-hook . anaconda-eldoc-mode)
-  )
+;; (use-package
+;;     company-anaconda
+;;   :after company
+;;   :config (add-to-list 'company-backends 'company-anaconda))
 
+;; ;; (use-package anaconda-mode
+;;   :ensure t
+;;   :hook
+;;   (python-mode-hook . anaconda-mode)
+;;   (python-mode-hook . anaconda-eldoc-mode)
+;;   (python-mode-hook . annotate-pdb)
+;;    :custom-update
+;;  (company-backends '(company-anaconda))
+
+(use-package company-jedi             ;;; company-mode completion back-end for Python JEDI
+  :config
+  (setq jedi:environment-virtualenv (list (expand-file-name "~/.local/share/virtualenvs")))
+  (add-hook 'python-mode-hook 'jedi:setup)
+  (setq jedi:complete-on-dot t)
+  (setq jedi:use-shortcuts t)
+  (defun config/enable-company-jedi ()
+    (add-to-list 'company-backends 'company-jedi))
+  (add-hook 'python-mode-hook 'config/enable-company-jedi))
+
+(use-package
+    pyvenv
+   :init (progn (add-hook 'python-mode-hook 'py-isort-before-save))
+   :config (defalias 'workon 'pyvenv-workon))
 
 (use-package python-pytest
   :custom
@@ -1208,10 +1238,14 @@
   ;; (magit-define-popup-switch 'python-pytest-popup?z "Custom flag" "--zzz")
   )
 
-(use-package
-    py-isort
+(use-package py-isort
   :config (setq py-isort-options '("-sl"))
-  :hook (python-mode-hook . py-isort-before-save))
+  :init (progn (add-hook 'python-mode-hook 'py-isort-before-save)))
+
+;; (use-package
+;;     py-isort
+;;   :config (setq py-isort-options '("-sl"))
+;;   :hook (python-mode-hook . py-isort-before-save))
 
 (use-package py-yapf
   :hook (python-mode-hook . py-yapf-enable-on-server))
