@@ -1202,19 +1202,6 @@
   :config
   (add-hook 'python-mode-hook 'importmagic-mode))
 
-;; (use-package
-;;     company-anaconda
-;;   :after company
-;;   :config (add-to-list 'company-backends 'company-anaconda))
-
-;; ;; (use-package anaconda-mode
-;;   :ensure t
-;;   :hook
-;;   (python-mode-hook . anaconda-mode)
-;;   (python-mode-hook . anaconda-eldoc-mode)
-;;   (python-mode-hook . annotate-pdb)
-;;    :custom-update
-;;  (company-backends '(company-anaconda))
 
 (use-package company-jedi             ;;; company-mode completion back-end for Python JEDI
   :config
@@ -1228,7 +1215,7 @@
 
 (use-package
     pyvenv
-   :init (progn (add-hook 'python-mode-hook 'py-isort-before-save))
+   :init (progn (add-hook 'python-mode-hook 'pyvenv-mode))
    :config (defalias 'workon 'pyvenv-workon))
 
 (use-package python-pytest
@@ -1242,13 +1229,9 @@
   :config (setq py-isort-options '("-sl"))
   :init (progn (add-hook 'python-mode-hook 'py-isort-before-save)))
 
-;; (use-package
-;;     py-isort
-;;   :config (setq py-isort-options '("-sl"))
-;;   :hook (python-mode-hook . py-isort-before-save))
 
 (use-package py-yapf
-  :hook (python-mode-hook . py-yapf-enable-on-server))
+  :init (progn( add-hook 'python-mode-hook  'py-yapf-enable-on-server))
 
 (use-package lisp
   :hook
