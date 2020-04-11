@@ -971,18 +971,6 @@
   :custom
   (jiralib-url "http://jira:8080"))
 
-(use-package synosaurus
-  :defer t
-  :ensure t
-  :custom
-  (synosaurus-choose-method 'default)
-  :config
-  (synosaurus-mode))
-
-(use-package writegood-mode
-  :defer t
-  :ensure t)
-
 (use-package ibuffer-vc
   :defer t
   :ensure t
@@ -1135,7 +1123,7 @@
   :ensure t
   :defer t
   :custom
-  (company-quickhelp-delay 3)
+  (company-quickhelp-delay 1)
   :config
   (company-quickhelp-mode 1))
 
@@ -1188,6 +1176,19 @@
   :config
   (avy-flycheck-setup))
 
+(use-package go-mode
+     :config    (add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
+     (require 'go-flymake)
+     (add-to-list 'load-path "~/go/src/github.com/dougm/goflymake")
+     (require 'go-flycheck))
+
+(use-package company-go
+    :ensure t
+    :after company
+    :defer t
+    :custom-update
+    (company-backends '(company-go)))
+
 (defun annotate-pdb()
   (interactive)
   (highlight-lines-matching-regexp "import ipdb")
@@ -1196,11 +1197,14 @@
   (highlight-regexp "^TODO ")
   (highlight-phrase "FIXME"))
 
+(use-package pyimport
+  :bind ("C-c C-i" . #'pyimport-insert-missing))
 
-(use-package importmagic
-  :ensure t
-  :config
-  (add-hook 'python-mode-hook 'importmagic-mode))
+
+;; (use-package importmagic
+;;   :ensure t
+;;   :config
+;;   (add-hook 'python-mode-hook 'importmagic-mode))
 
 
 (use-package company-jedi             ;;; company-mode completion back-end for Python JEDI
@@ -1208,6 +1212,8 @@
   (setq jedi:environment-virtualenv (list (expand-file-name "~/.local/share/virtualenvs")))
   (add-hook 'python-mode-hook 'jedi:setup)
   (setq jedi:complete-on-dot t)
+  (append python-environment-virtualenv
+          '("--python" "/usr/local/bin/python3"))
   (setq jedi:use-shortcuts t)
   (defun config/enable-company-jedi ()
     (add-to-list 'company-backends 'company-jedi))
@@ -1215,8 +1221,8 @@
 
 (use-package
     pyvenv
-   :init (progn (add-hook 'python-mode-hook 'pyvenv-mode))
-   :config (defalias 'workon 'pyvenv-workon))
+  :init (progn (add-hook 'python-mode-hook 'pyvenv-mode))
+  :config (defalias 'workon 'pyvenv-workon))
 
 (use-package python-pytest
   :custom
@@ -1225,13 +1231,19 @@
   ;; (magit-define-popup-switch 'python-pytest-popup?z "Custom flag" "--zzz")
   )
 
-(use-package py-isort
-  :config (setq py-isort-options '("-sl"))
-  :init (progn (add-hook 'python-mode-hook 'py-isort-before-save)))
+(use-package isortify
+  :init(progn(add-hook 'python-mode-hook 'isortify-mode)))
+
+;;  (use-package py-isort
+;;    :config (setq py-isort-options '("-sl"))
+;;    :init (progn (add-hook 'python-mode-hook 'py-isort-before-save)))
+
+(use-package yapfify
+  :init (progn(add-hook 'python-mode-hook 'yapf-mode)))
 
 
-(use-package py-yapf
-  :init (progn( add-hook 'python-mode-hook  'py-yapf-enable-on-server))
+;;(use-package py-yapf
+;;  :init (progn( add-hook 'python-mode-hook  'py-yapf-enable-on-server))
 
 (use-package lisp
   :hook
@@ -1492,6 +1504,18 @@
   :after (company restclient)
   :custom-update
   (company-backends '(company-restclient)))
+
+(use-package synosaurus
+  :defer t
+  :ensure t
+  :custom
+  (synosaurus-choose-method 'default)
+  :config
+  (synosaurus-mode))
+
+(use-package writegood-mode
+  :defer t
+  :ensure t)
 
 (use-package net-utils
   :ensure-system-package traceroute
