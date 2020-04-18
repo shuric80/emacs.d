@@ -289,6 +289,11 @@
   (:map dired-mode-map
         (")" . dired-git-info-mode)))
 
+(use-package neotree
+  :init (global-set-key [f8] 'neotree-toggle)
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+  )
+
 (use-package mule
   :config
   (prefer-coding-system 'utf-8)
