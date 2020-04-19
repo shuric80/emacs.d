@@ -1,8 +1,9 @@
-: Emacs Config fork from  [[https://github.com/a13][a13]] append python plugins.
+: Emacs Config.
 #+INFOJS_OPT: view:t toc:t ltoc:t mouse:underline buttons:0 path:https://www.linux.org.ru/tango/combined.css
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
 #+PROPERTY: header-args:emacs-lisp :tangle "init.el"
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
+* This is fork from  [[https://github.com/a13][a13]].
 * Foreword and keynotes
 ** Use Use-package
    I try to keep my configuration as declarative as possible, thanks to [[https://github.com/jwiegley/use-package][Use-package]] — it's easy now.
